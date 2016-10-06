@@ -7,3 +7,5 @@ authors = ["bryal <96.bryal@gmail.com>"]
 pulse-simple = "*"
 rustfft = "*"
 num = "*"
+serial = "*"
+time = "*"
