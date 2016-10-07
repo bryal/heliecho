@@ -18,7 +18,7 @@ const SAMPLE_RATE: usize = 48000;
 const SAMPLES_PER_PERIOD: usize = 1024;
 
 const BASS_CUTOFF: f32 = 410.0;
-const HIGH_CUTOFF: f32 = 4000.0;
+const HIGH_CUTOFF: f32 = 3800.0;
 
 fn bin_to_freq(i: usize) -> f32 {
     (i * SAMPLE_RATE) as f32 / SAMPLES_PER_PERIOD as f32
@@ -179,10 +179,10 @@ fn smooth_color(from: Rgb8, to: Rgb8) -> Rgb8 {
 fn init_write_thread(port: &str) -> mpsc::SyncSender<Rgb8> {
     use std::io::Write;
 
-    // let mut serial_con = serial::open(port).unwrap();
+    let mut serial_con = serial::open(port).unwrap();
 
-    // serial_con.reconfigure(&|cfg| cfg.set_baud_rate(ADALIGHT_BAUDRATE))
-    //     .unwrap();
+    serial_con.reconfigure(&|cfg| cfg.set_baud_rate(ADALIGHT_BAUDRATE))
+        .unwrap();
 
     let (tx, rx) = mpsc::sync_channel::<Rgb8>(0);
 
@@ -214,11 +214,11 @@ fn init_write_thread(port: &str) -> mpsc::SyncSender<Rgb8> {
                 color_buf[6 + 3 * n + 2] = color.b;
             }
 
-            // match serial_con.write(&color_buf[..]) {
-            //     Ok(bn) if bn == color_buf.len() => (),
-            //     Ok(_) => println!("Failed to write all bytes of RGB data"),
-            //     Err(e) => println!("Failed to write RGB data, {}", e),
-            // }
+            match serial_con.write(&color_buf[..]) {
+                Ok(bn) if bn == color_buf.len() => (),
+                Ok(_) => println!("Failed to write all bytes of RGB data"),
+                Err(e) => println!("Failed to write RGB data, {}", e),
+            }
 
             prev_recv_color = recv_color;
             prev_color = color;
